@@ -3,17 +3,16 @@
 // PID controller for the x direction.
 const float Kp_x = 5;
 const float Ki_x = 5;
-const float Kd_x = 5;
+const float Kd_x = -5;
 const float setpoint_x = 0;
 float process_x = 0;
 
 float angle_x = 0;
 
-
 // PID controller for the y direction.
 const float Kp_y = 5;
 const float Ki_y = 5;
-const float Kd_y = 5;
+const float Kd_y = -5;
 const float setpoint_y = 0;
 float process_y = 0;
 
@@ -34,9 +33,16 @@ float curr_time = millis();
 // In seconds.
 float dt = 0;
 
+// Flags for serial reading and handshake.
+bool input_received = false;
+
 void setup() {
   // put your setup code here, to run once:
-  
+  Serial.begin(9600);
+  while (!Serial) {
+    ;
+  }
+  handshake();
 }
 
 void calculate_pid() {
@@ -72,14 +78,39 @@ void move_motors() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  calculate_pid();
-  move_motors();
+  check_serial();
+  if (input_received) {
+    // put your main code here, to run repeatedly:
+    calculate_pid();
+    move_motors();
+  }
 }
 
 float delta_time() {
   curr_time = millis();
-  float delta = curr_time  last_time;
+  float delta = curr_time - last_time;
   last_time = curr_time;
   return delta / 1000;
+}
+
+void handshake() {
+  while (true) {
+    if (Serial.available()) {
+      if (Serial.readStringUntil("\n") == "READY?") {
+        Serial.println("OK");
+        return;
+      }
+    }
+  }
+}
+
+void check_serial() {
+  if (Serial.available()) {
+    process_x = stof(Serial.readStringUntil(" "));
+    process_y = stof(Serial.readStringUntil("\n"));
+    input_received = true;
+    return;
+  }
+  input_received = false;
+  return;
 }
