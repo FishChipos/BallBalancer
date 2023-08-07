@@ -1,5 +1,3 @@
-from curses import baudrate
-from socket import timeout
 import cv2
 import mediapipe as mp
 import time
@@ -7,7 +5,7 @@ import math
 import HandTrackingModule as htm
 import serial
 
-#arduino = serial.Serial(port='COM4',baudrate=9600,timeout=1)
+# arduino = serial.Serial(port='COM4',baudrate=9600,timeout=1)
 pTime = 0
 cTime = 0
 cap = cv2.VideoCapture(0)
