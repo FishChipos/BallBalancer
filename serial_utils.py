@@ -5,7 +5,7 @@ def get_arduino_port():
     '''
     Expects the board to reply with "OK".
     '''
-    ports = list_ports.comports()
+    ports = [port.name for port in list_ports.comports()]
     print(ports)
     
 get_arduino_port()
